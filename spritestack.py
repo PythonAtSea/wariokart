@@ -59,14 +59,14 @@ class Car:
             self.d-=0.15
         elif not keys[K_SPACE]:
             self.d*=0.99
-            if self.d <= 0.5 and self.d >= -0.5:
+            if self.d <= 0.005 and self.d >= -0.005:
                 self.d=0
         if keys[K_SPACE]:
             if self.d > 0:
                 self.d-=0.15
             else:
                 self.d+=0.15
-            if self.d <= 0.5 and self.d >= -0.5:
+            if self.d <= 0.005 and self.d >= -0.005:
                 self.d=0
             if self.dx <= 1 and self.dx >= -1:
                 self.d=0
