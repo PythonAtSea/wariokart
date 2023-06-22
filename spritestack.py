@@ -1,7 +1,7 @@
 import sys
 import os
 import math
-
+import datetime
 import pygame
 from pygame.locals import *
 import render
@@ -88,7 +88,13 @@ class Car:
 clock=pygame.time.Clock()
 car=Car(imgs=images, x=0, y=0, dir=45)
 tiles=[]
+logo=pygame.image.load("logo.png")
+logo.set_colorkey((255,0,0))
+pygame.display.set_icon(logo)
 sand=pygame.transform.scale_by(pygame.image.load("tiles/sand.png"), SCALE_FACTOR)
+def screenshot_path():
+    now = datetime.datetime.now()
+    return now.strftime('screenshot_%Y-%m-%d_%H:%M:%S.%f.png')
 for i in range(20):
     tiles.append([])
     for j in range(20):
@@ -99,11 +105,14 @@ while True:
     offset=(screen.get_width()/2-car.x,screen.get_height()/2-car.y)
     frame += 0.5
     keys = pygame.key.get_pressed()
-
+    takescreenshot=False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == KEYDOWN:
+            if event.key == K_F12:
+                takescreenshot=True
 
     if keys[K_ESCAPE]:
         pygame.quit()
@@ -111,8 +120,11 @@ while True:
     for i in range(20):
         for j in range(20):
             screen.blit(sand, (64*i+offset[0], 64*j+offset[1]))
+
     car.draw()
     car.move()
+    if takescreenshot:
+        pygame.image.save(screen, screenshot_path())
 
     pygame.display.update()
     clock.tick(60)
