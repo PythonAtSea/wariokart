@@ -62,9 +62,10 @@ class Car:
             if self.d <= 0.5 and self.d >= -0.5:
                 self.d=0
         if keys[K_SPACE]:
-            self.d*=0.8
-            self.dx*=0.8
-            self.dy*=0.8
+            if self.d > 0:
+                self.d-=0.15
+            else:
+                self.d+=0.15
             if self.d <= 0.5 and self.d >= -0.5:
                 self.d=0
             if self.dx <= 1 and self.dx >= -1:
@@ -76,8 +77,8 @@ class Car:
             self.y=0
         self.dx+=math.sin(math.radians(self.dir))*self.speed*self.prevd
         self.dy+=math.cos(math.radians(self.dir))*self.speed*self.prevd
-        self.dx*=0.8
-        self.dy*=0.8
+        self.dx*=0.7
+        self.dy*=0.7
         self.dx-=math.sin(math.radians(self.dir))*self.speed*self.d
         self.dy-=math.cos(math.radians(self.dir))*self.speed*self.d
         self.x+=self.dx
