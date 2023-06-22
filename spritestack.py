@@ -26,18 +26,33 @@ class Car:
         self.speed=speed
         self.d=0
         self.tuning=1
+        self.dx=0
+        self.dy=0
+        self.prevd=0
     def draw(self):
         imgs = [pygame.transform.scale_by(pygame.transform.rotate(img, self.dir), SCALE_FACTOR) for img in self.imgs]
         render.render_stack(screen, imgs, (screen.get_width()/2, screen.get_height()/2), 0, spready=5)
     def move(self):
-        if keys[K_a] and self.d>1.5:
-            self.dir+=7-abs(self.d)
-        elif keys[K_a] and self.d>0:
-            self.dir+=abs(self.d)
-        if keys[K_d] and self.d>1.5:
-            self.dir-=7-abs(self.d)
-        elif keys[K_d] and self.d>0:
-            self.dir-=abs(self.d)
+        if keys[K_a] and abs(self.d) > 1.5:
+            if self.d > 0:
+                self.dir+=3
+            else:
+                self.dir-=3
+        elif keys[K_a]:
+            if self.d > 0:
+                self.dir+=abs(self.d)/2
+            else:
+                self.dir-=abs(self.d)/2
+        if keys[K_d] and abs(self.d) > 1.5:
+            if self.d > 0:
+                self.dir-=3
+            else:
+                self.dir+=3
+        elif keys[K_d]:
+            if self.d > 0:
+                self.dir-=abs(self.d)/2
+            else:
+                self.dir+=abs(self.d)/2
         if keys[K_w] and self.d <=7:
             self.d+=0.25
         elif keys[K_s] and self.d >=-4:
@@ -48,12 +63,30 @@ class Car:
                 self.d=0
         if keys[K_SPACE]:
             self.d*=0.8
+            self.dx*=0.8
+            self.dy*=0.8
             if self.d <= 0.5 and self.d >= -0.5:
                 self.d=0
-        self.x-=math.sin(math.radians(self.dir))*self.speed*self.d
-        self.y-=math.cos(math.radians(self.dir))*self.speed*self.d
+            if self.dx <= 1 and self.dx >= -1:
+                self.d=0
+            if self.dy <= 1 and self.dy >= -1:
+                self.d=0
+        if keys[K_r]:
+            self.x=0
+            self.y=0
+        self.dx+=math.sin(math.radians(self.dir))*self.speed*self.prevd
+        self.dy+=math.cos(math.radians(self.dir))*self.speed*self.prevd
+        self.dx*=0.8
+        self.dy*=0.8
+        self.dx-=math.sin(math.radians(self.dir))*self.speed*self.d
+        self.dy-=math.cos(math.radians(self.dir))*self.speed*self.d
+        self.x+=self.dx
+        self.y+=self.dy
+        self.prevd=self.d
+        print(self.x)
+        print(self.y)
 clock=pygame.time.Clock()
-car=Car(imgs=images, x=0, y=0)
+car=Car(imgs=images, x=0, y=0, dir=45)
 tiles=[]
 sand=pygame.transform.scale_by(pygame.image.load("tiles/sand.png"), SCALE_FACTOR)
 for i in range(20):
