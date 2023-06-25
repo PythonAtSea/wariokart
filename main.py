@@ -13,7 +13,10 @@ display = pygame.Surface((100, 100))
 font = pygame.font.Font("fonts/Pixel.ttf", 35)
 temp = os.listdir("car")
 temp.sort()
-images = [pygame.image.load("car/" + img) for img in temp]
+car_images = [pygame.image.load("car/" + img) for img in temp]
+temp = os.listdir("cone")
+temp.sort()
+cone_images = [pygame.image.load("cone/" + img) for img in temp]
 clock = pygame.time.Clock()
 SCALE_FACTOR = 5
 frame = 0
@@ -38,7 +41,7 @@ class Object:
         render.render_stack(
             screen,
             imgs,
-            (screen.get_width() / 2, screen.get_height() / 2),
+            (offset[0] - self.x, offset[1] - self.y),
             0,
             spready=5,
         )
@@ -127,7 +130,8 @@ class Car:
 
 
 clock = pygame.time.Clock()
-car = Car(imgs=images, x=0, y=0, dir=45)
+car = Car(imgs=car_images, x=0, y=0, dir=45)
+cone = Object(imgs=cone_images, x=0, y=0, dir=45)
 tiles = []
 logo = pygame.image.load("logo.png")
 logo.set_colorkey((255, 0, 0))
@@ -151,14 +155,14 @@ while True:
     offset = (screen.get_width() / 2 - car.x, screen.get_height() / 2 - car.y)
     frame += 0.5
     keys = pygame.key.get_pressed()
-    takescreenshot = False
+    take_screenshot = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
         if event.type == KEYDOWN:
             if event.key == K_F12:
-                takescreenshot = True
+                take_screenshot = True
 
     if keys[K_ESCAPE]:
         pygame.quit()
@@ -169,7 +173,9 @@ while True:
 
     car.draw()
     car.move()
-    if takescreenshot:
+    cone.draw()
+    cone.dir += 5
+    if take_screenshot:
         pygame.image.save(screen, screenshot_path())
     clock.tick(PREFERRED_FPS)
     fps = clock.get_fps()
