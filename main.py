@@ -19,7 +19,7 @@ temp.sort()
 cone_images = [pygame.image.load("cone/" + img) for img in temp]
 clock = pygame.time.Clock()
 SCALE_FACTOR = 5
-frame = 0
+
 
 
 class Object:
@@ -30,6 +30,7 @@ class Object:
         self.dir = dir
         self.dx = 0
         self.dy = 0
+        self.rect = pygame.Rect(0, 0, 0, 0)
 
     def draw(self):
         imgs = [
@@ -38,6 +39,9 @@ class Object:
             )
             for img in self.imgs
         ]
+        self.rect = imgs[0].get_rect().move(-self.x-imgs[0].get_width()/2,
+                                            -self.y-imgs[0].get_height()/2)
+        pygame.draw.rect(screen, (255, 0, 0), self.rect.move((offset[0], offset[1])), 1)
         render.render_stack(
             screen,
             imgs,
@@ -45,6 +49,12 @@ class Object:
             0,
             spready=5,
         )
+
+    def move(self):
+        self.x += self.dx
+        self.y += self.dy
+        self.dy *= 0.7
+        self.dx *= 0.7
 
 
 class Car:
@@ -59,6 +69,7 @@ class Car:
         self.dx = 0
         self.dy = 0
         self.previousd = 0
+        self.rect = pygame.Rect(0, 0, 0, 0)
 
     def draw(self):
         imgs = [
@@ -67,6 +78,9 @@ class Car:
             )
             for img in self.imgs
         ]
+        self.rect = imgs[0].get_rect().move(self.x-imgs[0].get_width()/2, self.y-imgs[
+            0].get_height()/2)
+        print(self.rect.size)
         render.render_stack(
             screen,
             imgs,
@@ -131,7 +145,7 @@ class Car:
 
 clock = pygame.time.Clock()
 car = Car(imgs=car_images, x=0, y=0, dir=45)
-cone = Object(imgs=cone_images, x=0, y=0, dir=45)
+cone = Object(imgs=cone_images, x=-100, y=-100, dir=45)
 tiles = []
 logo = pygame.image.load("logo.png")
 logo.set_colorkey((255, 0, 0))
@@ -152,8 +166,24 @@ for i in range(20):
 while True:
     clock.tick(60)
     screen.fill((255, 0, 255))
+    if car.rect.colliderect(cone.rect):
+        print("collide")
+        cone.dx = car.dx * -1.5
+        cone.dy = car.dy * -1.5
+        if car.dx > 0:
+            car.dx = 1
+            car.x -=10
+        else:
+            car.dx = -1
+            car.x +=10
+        if car.dy > 0:
+            car.dy = 1
+            car.y -=10
+        else:
+            car.dy = -1
+            car.y +=10
+        screen.fill((255, 0, 0))
     offset = (screen.get_width() / 2 - car.x, screen.get_height() / 2 - car.y)
-    frame += 0.5
     keys = pygame.key.get_pressed()
     take_screenshot = False
     for event in pygame.event.get():
@@ -174,7 +204,8 @@ while True:
     car.draw()
     car.move()
     cone.draw()
-    cone.dir += 5
+    cone.move()
+
     if take_screenshot:
         pygame.image.save(screen, screenshot_path())
     clock.tick(PREFERRED_FPS)
